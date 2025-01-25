@@ -4,6 +4,8 @@ import io.grpc.stub.StreamObserver;
 import nom.brunokarpo.grpc.calculator.*;
 
 public class CalculatorService extends CalculatorServiceGrpc.CalculatorServiceImplBase {
+
+    // Unary
     @Override
     public void sum(CalculatorRequest request, StreamObserver<CalculatorResponse> responseObserver) {
         System.out.println("Received a calculation request");
@@ -15,6 +17,7 @@ public class CalculatorService extends CalculatorServiceGrpc.CalculatorServiceIm
         System.out.println("response sent");
     }
 
+    // Server streaming
     @Override
     public void primes(PrimeRequest request, StreamObserver<PrimeResponse> responseObserver) {
         long base = request.getNumber();
@@ -30,6 +33,7 @@ public class CalculatorService extends CalculatorServiceGrpc.CalculatorServiceIm
         responseObserver.onCompleted();
     }
 
+    // Client streaming
     @Override
     public StreamObserver<AverageRequest> average(StreamObserver<AverageResponse> responseObserver) {
         class AverageState {
