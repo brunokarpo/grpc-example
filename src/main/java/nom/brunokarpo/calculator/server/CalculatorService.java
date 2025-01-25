@@ -1,9 +1,7 @@
 package nom.brunokarpo.calculator.server;
 
 import io.grpc.stub.StreamObserver;
-import nom.brunokarpo.grpc.calculator.CalculatorRequest;
-import nom.brunokarpo.grpc.calculator.CalculatorResponse;
-import nom.brunokarpo.grpc.calculator.CalculatorServiceGrpc;
+import nom.brunokarpo.grpc.calculator.*;
 
 public class CalculatorService extends CalculatorServiceGrpc.CalculatorServiceImplBase {
     @Override
@@ -15,5 +13,20 @@ public class CalculatorService extends CalculatorServiceGrpc.CalculatorServiceIm
         responseObserver.onNext(CalculatorResponse.newBuilder().setResult(firstNumber + secondNumber).build());
         responseObserver.onCompleted();
         System.out.println("response sent");
+    }
+
+    @Override
+    public void primes(PrimeRequest request, StreamObserver<PrimeResponse> responseObserver) {
+        long base = request.getNumber();
+        int k = 2;
+        while (base > 1) {
+            if (base % k == 0) {
+                responseObserver.onNext(PrimeResponse.newBuilder().setPrimeFactor(k).build());
+                base /= k;
+            } else {
+                k++;
+            }
+        }
+        responseObserver.onCompleted();
     }
 }
