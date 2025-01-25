@@ -1,4 +1,4 @@
-package nom.brunokarpo.client;
+package nom.brunokarpo.greeting.client;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

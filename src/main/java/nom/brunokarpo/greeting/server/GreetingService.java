@@ -1,4 +1,4 @@
-package nom.brunokarpo.server;
+package nom.brunokarpo.greeting.server;
 
 import io.grpc.stub.StreamObserver;
 import nom.brunokarpo.grpc.greeting.GreetingRequest;
