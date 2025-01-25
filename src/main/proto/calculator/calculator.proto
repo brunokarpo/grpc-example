@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package calculator;
+
+option java_package = "nom.brunokarpo.grpc.calculator";
+option java_multiple_files = true;
+
+message CalculatorRequest {
+    int32 firstNumber = 1;
+    int32 secondNumber = 2;
+}
+
+message CalculatorResponse {
+    int32 result = 1;
+}
+
+service CalculatorService {
+  rpc sum(CalculatorRequest) returns (CalculatorResponse);
+}
