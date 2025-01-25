@@ -11,7 +11,10 @@ public class GreetingServer {
         int port = 50051;
 
         // Create a new server to listen on port
-        Server server = ServerBuilder.forPort(port).build();
+        Server server = ServerBuilder
+                .forPort(port)
+                .addService(new GreetingService())
+                .build();
 
         // Starting the server
         server.start();
