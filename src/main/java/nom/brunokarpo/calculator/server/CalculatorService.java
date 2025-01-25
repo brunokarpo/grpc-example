@@ -65,4 +65,32 @@ public class CalculatorService extends CalculatorServiceGrpc.CalculatorServiceIm
             }
         };
     }
+
+    // Bidirectional stream
+
+    @Override
+    public StreamObserver<MaximumRequest> maximum(StreamObserver<MaximumResponse> responseObserver) {
+        return new StreamObserver<MaximumRequest>() {
+            int minimum = Integer.MIN_VALUE;
+
+            @Override
+            public void onNext(MaximumRequest maximumRequest) {
+                int number = maximumRequest.getNumber();
+                if (number > minimum) {
+                    minimum = number;
+                    responseObserver.onNext(MaximumResponse.newBuilder().setValue(number).build());
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                responseObserver.onError(throwable);
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onCompleted();
+            }
+        };
+    }
 }

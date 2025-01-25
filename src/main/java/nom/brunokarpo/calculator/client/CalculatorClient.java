@@ -6,6 +6,7 @@ import io.grpc.stub.StreamObserver;
 import nom.brunokarpo.grpc.calculator.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -60,6 +61,33 @@ public class CalculatorClient {
         latch.await(3, TimeUnit.SECONDS);
     }
 
+    private static void doMaximum(ManagedChannel channel) throws InterruptedException {
+        CalculatorServiceGrpc.CalculatorServiceStub stub = CalculatorServiceGrpc.newStub(channel);
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        StreamObserver<MaximumRequest> stream = stub.maximum(new StreamObserver<MaximumResponse>() {
+            @Override
+            public void onNext(MaximumResponse maximumResponse) {
+                System.out.println(maximumResponse.getValue());
+            }
+
+            @Override
+            public void onError(Throwable throwable) {}
+
+            @Override
+            public void onCompleted() {
+                latch.countDown();
+            }
+        });
+
+        Arrays.asList(1, 5, 3, 6, 2, 20).forEach(number ->
+                stream.onNext(MaximumRequest.newBuilder().setNumber(number).build())
+        );
+
+        latch.await(3, TimeUnit.SECONDS);
+    }
+
     public static void main(String[] args) throws InterruptedException {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress("localhost", 50052)
@@ -70,6 +98,7 @@ public class CalculatorClient {
             case "sum": doCalculation(channel); break;
             case "decompose": doPrimeDecomposition(channel); break;
             case "average": doAverage(channel); break;
+            case "maximum": doMaximum(channel); break;
             default:
                 System.out.println("Invalid argument: " + args[0]);
         }

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package calculator;
+
+option java_package = "nom.brunokarpo.grpc.calculator";
+option java_multiple_files = true;
+
+message MaximumRequest {
+  int32 number = 1;
+}
+
+message MaximumResponse {
+  int32 value = 1;
+}
