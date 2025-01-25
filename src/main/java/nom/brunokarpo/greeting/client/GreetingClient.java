@@ -8,6 +8,7 @@ import nom.brunokarpo.grpc.greeting.GreetingResponse;
 import nom.brunokarpo.grpc.greeting.GreetingServiceGrpc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -63,6 +64,34 @@ public class GreetingClient {
         latch.await(3, TimeUnit.SECONDS);
     }
 
+    private static void doGreetEveryone(ManagedChannel channel) throws InterruptedException {
+        System.out.println("Enter doGreetEveryone");
+        GreetingServiceGrpc.GreetingServiceStub stub = GreetingServiceGrpc.newStub(channel);
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        StreamObserver<GreetingRequest> stream = stub.greetEveryone(new StreamObserver<GreetingResponse>() {
+            @Override
+            public void onNext(GreetingResponse greetingResponse) {
+                System.out.println(greetingResponse.getResult());
+            }
+
+            @Override
+            public void onError(Throwable throwable) {}
+
+            @Override
+            public void onCompleted() {
+                latch.countDown();
+            }
+        });
+
+        Arrays.asList("Bruno", "Dayane", "Aldemiro", "Eliana").forEach(name -> {
+            stream.onNext(GreetingRequest.newBuilder().setFirstName(name).build());
+        });
+
+        latch.await(3, TimeUnit.SECONDS);
+    }
+
     public static void main(String[] args) throws InterruptedException {
         if (args.length == 0) {
             System.out.println("Need one argument to work");
@@ -79,6 +108,7 @@ public class GreetingClient {
             case "greet": doGreet(channel); break;
             case "greet-many-times": doGreetManyTimes(channel); break;
             case "long-greet": doLongGreet(channel); break;
+            case "greet-everyone": doGreetEveryone(channel); break;
             default:
                 System.out.println("Keyword invalid: " + args[0]);
         }

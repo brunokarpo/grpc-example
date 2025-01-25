@@ -1,6 +1,7 @@
 package nom.brunokarpo.greeting.server;
 
 import io.grpc.stub.StreamObserver;
+import nom.brunokarpo.grpc.greeting.Greeting;
 import nom.brunokarpo.grpc.greeting.GreetingRequest;
 import nom.brunokarpo.grpc.greeting.GreetingResponse;
 import nom.brunokarpo.grpc.greeting.GreetingServiceGrpc;
@@ -41,6 +42,26 @@ public class GreetingService extends GreetingServiceGrpc.GreetingServiceImplBase
             @Override
             public void onCompleted() {
                 responseObserver.onNext(GreetingResponse.newBuilder().setResult(sb.toString()).build());
+                responseObserver.onCompleted();
+            }
+        };
+    }
+
+    @Override
+    public StreamObserver<GreetingRequest> greetEveryone(StreamObserver<GreetingResponse> responseObserver) {
+        return new StreamObserver<GreetingRequest>() {
+            @Override
+            public void onNext(GreetingRequest greetingRequest) {
+                responseObserver.onNext(GreetingResponse.newBuilder().setResult("Hello " + greetingRequest.getFirstName()).build());
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                responseObserver.onError(throwable);
+            }
+
+            @Override
+            public void onCompleted() {
                 responseObserver.onCompleted();
             }
         };
