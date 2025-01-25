@@ -15,6 +15,15 @@ public class GreetingClient {
         System.out.println("Response: " + response.getResult());
     }
 
+    private static void doGreetManyTimes(ManagedChannel channel) {
+        System.out.println("Enter doGreetManyTimes");
+        GreetingServiceGrpc.GreetingServiceBlockingStub stub = GreetingServiceGrpc.newBlockingStub(channel);
+
+        stub.greetingManyTimes(GreetingRequest.newBuilder().setFirstName("Bruno").build()).forEachRemaining( response ->  {
+            System.out.println(response.getResult());
+        });
+    }
+
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("Need one argument to work");
@@ -29,6 +38,8 @@ public class GreetingClient {
 
         if (args[0].equals("greet")) {
             doGreet(channel);
+        } else if (args[0].equals("greet-many-times")) {
+            doGreetManyTimes(channel);
         } else {
             System.out.println("Keyword invalid: " + args[0]);
         }
