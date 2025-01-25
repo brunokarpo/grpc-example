@@ -29,4 +29,36 @@ public class CalculatorService extends CalculatorServiceGrpc.CalculatorServiceIm
         }
         responseObserver.onCompleted();
     }
+
+    @Override
+    public StreamObserver<AverageRequest> average(StreamObserver<AverageResponse> responseObserver) {
+        class AverageState {
+            int sum = 0;
+            int count = 0;
+
+            public double average() {
+                return (double) sum / count;
+            }
+        }
+        AverageState state = new AverageState();
+
+        return new StreamObserver<AverageRequest>() {
+            @Override
+            public void onNext(AverageRequest averageRequest) {
+                state.sum += averageRequest.getNumber();
+                state.count++;
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                responseObserver.onError(throwable);
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onNext(AverageResponse.newBuilder().setAverage(state.average()).build());
+                responseObserver.onCompleted();
+            }
+        };
+    }
 }

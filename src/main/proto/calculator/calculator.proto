@@ -7,8 +7,10 @@ option java_multiple_files = true;
 
 import "calculator/sum.proto";
 import "calculator/primes.proto";
+import "calculator/average.proto";
 
 service CalculatorService {
   rpc sum(CalculatorRequest) returns (CalculatorResponse);
   rpc primes(PrimeRequest) returns (stream PrimeResponse);
+  rpc average(stream AverageRequest) returns (AverageResponse);
 }

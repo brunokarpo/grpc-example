@@ -2,10 +2,15 @@ package nom.brunokarpo.calculator.client;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import nom.brunokarpo.grpc.calculator.CalculatorRequest;
-import nom.brunokarpo.grpc.calculator.CalculatorResponse;
-import nom.brunokarpo.grpc.calculator.CalculatorServiceGrpc;
-import nom.brunokarpo.grpc.calculator.PrimeRequest;
+import io.grpc.stub.StreamObserver;
+import nom.brunokarpo.grpc.calculator.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class CalculatorClient {
 
@@ -25,7 +30,38 @@ public class CalculatorClient {
         });
     }
 
-    public static void main(String[] args) {
+    private static void doAverage(ManagedChannel channel) throws InterruptedException {
+        CalculatorServiceGrpc.CalculatorServiceStub stub = CalculatorServiceGrpc.newStub(channel);
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        StreamObserver<AverageRequest> stream = stub.average(new StreamObserver<AverageResponse>() {
+            @Override
+            public void onNext(AverageResponse averageResponse) {
+                System.out.println(averageResponse.getAverage());
+            }
+
+            @Override
+            public void onError(Throwable throwable) {}
+
+            @Override
+            public void onCompleted() {
+                latch.countDown();
+            }
+        });
+
+        List<Integer> numbers = new ArrayList<>();
+        Collections.addAll(numbers, 1, 2, 3, 4);
+
+        for (Integer number : numbers) {
+            stream.onNext(AverageRequest.newBuilder().setNumber(number).build());
+        }
+
+        stream.onCompleted();
+        latch.await(3, TimeUnit.SECONDS);
+    }
+
+    public static void main(String[] args) throws InterruptedException {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress("localhost", 50052)
                 .usePlaintext()
@@ -34,6 +70,7 @@ public class CalculatorClient {
         switch (args[0]) {
             case "sum": doCalculation(channel); break;
             case "decompose": doPrimeDecomposition(channel); break;
+            case "average": doAverage(channel); break;
             default:
                 System.out.println("Invalid argument: " + args[0]);
         }
