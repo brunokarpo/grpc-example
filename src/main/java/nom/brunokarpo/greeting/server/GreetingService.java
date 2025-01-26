@@ -1,7 +1,7 @@
 package nom.brunokarpo.greeting.server;
 
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
-import nom.brunokarpo.grpc.greeting.Greeting;
 import nom.brunokarpo.grpc.greeting.GreetingRequest;
 import nom.brunokarpo.grpc.greeting.GreetingResponse;
 import nom.brunokarpo.grpc.greeting.GreetingServiceGrpc;
@@ -65,5 +65,25 @@ public class GreetingService extends GreetingServiceGrpc.GreetingServiceImplBase
                 responseObserver.onCompleted();
             }
         };
+    }
+
+    @Override
+    public void greetWithDeadline(GreetingRequest request, StreamObserver<GreetingResponse> responseObserver) {
+        Context context = Context.current();
+
+        try {
+            for (int i = 0; i < 3; i++) {
+                if (context.isCancelled()) {
+                    return;
+                }
+
+                Thread.sleep(100);
+            }
+
+            responseObserver.onNext(GreetingResponse.newBuilder().setResult("Hello " + request.getFirstName()).build());
+            responseObserver.onCompleted();
+        } catch (InterruptedException e) {
+            responseObserver.onError(e);
+        }
     }
 }
