@@ -36,6 +36,9 @@ dependencies {
     implementation "io.grpc:grpc-services:1.70.0"
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
 
+    // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync
+    implementation 'org.mongodb:mongodb-driver-sync:5.3.1'
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
