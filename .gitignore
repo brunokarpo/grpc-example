@@ -41,3 +41,9 @@ bin/
 ### Mac OS ###
 .DS_Store
 /.idea/
+
+## SSL
+*.crt
+*.key
+*.csr
+*.pem
