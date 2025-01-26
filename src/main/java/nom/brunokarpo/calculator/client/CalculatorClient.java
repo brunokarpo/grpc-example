@@ -88,6 +88,23 @@ public class CalculatorClient {
         latch.await(3, TimeUnit.SECONDS);
     }
 
+    private static void doSqrt(ManagedChannel channel) {
+        System.out.println("Entered sqrt");
+
+        CalculatorServiceGrpc.CalculatorServiceBlockingStub stub = CalculatorServiceGrpc.newBlockingStub(channel);
+        SqrtResponse response = stub.sqrt(SqrtRequest.newBuilder().setNumber(25).build());
+
+        System.out.println("Sqrt 25 = " + response.getResult());
+
+        try {
+            response = stub.sqrt(SqrtRequest.newBuilder().setNumber(-25).buildPartial());
+            System.out.println("Sqrt -25 = " + response.getResult());
+        } catch (RuntimeException ex) {
+            System.out.println("Got an Exception for sqrt");
+            ex.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) throws InterruptedException {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress("localhost", 50052)
@@ -99,6 +116,7 @@ public class CalculatorClient {
             case "decompose": doPrimeDecomposition(channel); break;
             case "average": doAverage(channel); break;
             case "maximum": doMaximum(channel); break;
+            case "sqrt": doSqrt(channel); break;
             default:
                 System.out.println("Invalid argument: " + args[0]);
         }
